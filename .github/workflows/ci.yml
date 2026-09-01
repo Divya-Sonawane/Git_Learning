@@ -1,43 +1,94 @@
-name: CI
+name: CI Quality Gates
 
 on:
-    pull_request:
-        branches:
-            - develop
+  pull_request:
+    branches:
+      - develop
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.1'
+          cache: 'npm'
+          cache-dependency-path: './Day 2/package-lock.json'
 
-            - uses: actions/setup-node@v4
-              with:
-                node-version: '20.18.1'
-                cache: 'npm'
-                cache-dependency-path: './Day 2/package-lock.json'
+      - name: Install dependencies
+        run: npm ci
+        working-directory: './Day 2'
 
-            - name: Install dependencies
-              run: npm ci
-              working-directory: './Day 2'
+      - name: Validate commit message
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+        working-directory: './Day 2'
 
-            - name: Check formatting
-              run: npx prettier --check
-              working-directory: './Day 2'
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-            - name: Run ESLint
-              run: npx eslint .
-              working-directory: './Day 2'
-
-            - name: Validate commit message
-              run: npx commitlint --from HEAD~1 --to HEAD
-              working-directory: './Day 2'
-
-            - name: TypeScript validation
-              run: npx tsc --noEmit
-              working-directory: './Day 2'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.1'
+          cache: 'npm'
+          cache-dependency-path: './Day 2/package-lock.json'
 
 
+      - name: Install dependencies
+        run: npm ci
+        working-directory: './Day 2'
+
+      - name: Run ESLint
+        run: npx eslint .
+        working-directory: './Day 2'
+
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.1'
+          cache: 'npm'
+          cache-dependency-path: './Day 2/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: './Day 2'
+
+      - name: Check formatting
+        run: npx prettier --check .
+        working-directory: './Day 2'
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.1'
+          cache: 'npm'
+          cache-dependency-path: './Day 2/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: './Day 2'
+
+      - name: Type check
+        run: npx tsc --noEmit
+        working-directory: './Day 2'
