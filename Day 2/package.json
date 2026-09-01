@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/Divya-Sonawane/Git_Learning/issues"
   },
-  "homepage": "https://github.com/Divya-Sonawane/Git_Learning#readme"
+  "homepage": "https://github.com/Divya-Sonawane/Git_Learning#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2"
+  }
 }
